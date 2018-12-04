@@ -49,13 +49,13 @@ export default class BdayAnniversaryWebPart extends BaseClientSideWebPart<IBdayA
 
   private _firstGetList() {
     var today = new Date();
-    var startDay = 1;
-    var startMonth = 11;
+    var startDay = today.getDate();
+    var startMonth = today.getMonth();
     var currentYear = today.getFullYear();
 
     var date = new Date(); date.setDate(date.getDate() + 7); 
-    var endDay = 30;
-    var endMonth = 11;
+    var endDay = date.getDate();
+    var endMonth = date.getMonth();
     if(startMonth !== endMonth){
       this.get2months(startDay, startMonth, endDay, endMonth).then((response) => {
         this._renderList(response.value, startDay, startMonth, endDay, endMonth, currentYear, 2)
