@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "gsrv-2018-client-side-solution",
+    "id": "78978d9b-b236-45c3-b0af-3cf35c0846e2",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true
+  },
+  "paths": {
+    "zippedPackage": "solution/gsrv-2018.sppkg"
+  }
+}
