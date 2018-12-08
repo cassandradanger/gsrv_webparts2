@@ -11,6 +11,7 @@ import {
 
 import styles from './BdayAnniversaryWebPart.module.scss';
 import * as strings from 'BdayAnniversaryWebPartStrings';
+import pluralize from 'pluralize';
 
 export interface IBdayAnniversaryWebPartProps {
   description: string;
@@ -26,23 +27,25 @@ export interface ISPList{
   Birth_x0020_Day: string;
   Birth_x0020_Month: string;
   AnniversaryYear: number;
+  AnniversaryMonth: number;
+  Email: string;
 }
 
 var today = new Date();
-var startDay = today.getDate();
-var startMonth = today.getMonth() +1;
+var currentMonth = today.getMonth() +1;
 var currentYear = today.getFullYear();
 
 var date = new Date(); date.setDate(date.getDate() + 7); 
-var endDay = date.getDate();
-var endMonth = date.getMonth() +1;
 
 export default class BdayAnniversaryWebPart extends BaseClientSideWebPart<IBdayAnniversaryWebPartProps> {
 
   public render(): void {
     this.domElement.innerHTML = `
     <div class=${styles.main}>
-        <p class=${styles.title}>* Birthdays & Anniversaries</p>
+        <p class=${styles.title}> 
+          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 18 18"><path fill="green" d="M9 11.3l3.71 2.7-1.42-4.36L15 7h-4.55L9 2.5 7.55 7H3l3.71 2.64L5.29 14z"/><path fill="none" d="M0 0h18v18H0z"/></svg>
+          Birthdays & Anniversaries
+        </p>
         <ul class=${styles.content}>
           <div id="spListContainer" /></div>
         </ul>
@@ -58,90 +61,64 @@ export default class BdayAnniversaryWebPart extends BaseClientSideWebPart<IBdayA
 
   private _firstGetList() {
     this.context.spHttpClient.get(this.context.pageContext.web.absoluteUrl + 
-      `/_api/web/Lists/GetByTitle('Staff Events')/Items?$filter=((Birth_x0020_Month eq ` + startMonth + `) or (AnniversaryMonth eq ` + startMonth + '))', SPHttpClient.configurations.v1)
+      `/_api/web/Lists/GetByTitle('Staff Events')/Items?$filter=((Birth_x0020_Month eq ` + currentMonth + `) or (AnniversaryMonth eq ` + currentMonth + '))', SPHttpClient.configurations.v1)
       .then((response)=>{
         response.json().then((data)=>{
           this._renderList(data.value)
         })
       });
-
-
-
-    // if(startMonth !== endMonth){
-    //   this.get2months(startDay, startMonth, endDay, endMonth).then((response) => {
-    //     this._renderList(response.value, startDay, startMonth, endDay, endMonth, currentYear, 2)
-    //   })
-    // } else {
-    //   this.get1month(startDay, startMonth, endDay)
-    //   .then((response) => {
-    //     console.log("teting", response);
-    //     this._renderList(response.value, startDay, startMonth, endDay, endMonth, currentYear, 1);
-    //   });
-    // }
-  }
-
-  private testingFunction(response){
-    console.log(response);
-    this._renderList(response.value);
-  }
-
-  private get2months(startDay, startMonth, endDay, endMonth) {
-    var bdayfirstMonth = this.context.spHttpClient.get(this.context.pageContext.web.absoluteUrl + 
-    `/_api/web/Lists/GetByTitle('Staff Events')/Items?$filter=Birth_x0020_Day gt `+ startDay + 
-    ` and Birth_x0020_Month eq ` + startMonth + `'`, SPHttpClient.configurations.v1)
-    .then((response) => {
-      return response.json();
-    });  
-    var bdaySecondMonth = this.context.spHttpClient.get(this.context.pageContext.web.absoluteUrl + 
-    `/_api/web/Lists/GetByTitle('Staff Events')/Items?$filter=Birth_x0020_Day lt `+ endDay + 
-    ` and Birth_x0020_Month eq ` + endMonth + `'`, SPHttpClient.configurations.v1)
-    .then((response) => {
-      return response.json();
-    });
-    var annifirstMonth = this.context.spHttpClient.get(this.context.pageContext.web.absoluteUrl + 
-      `/_api/web/Lists/GetByTitle('Staff Events')/Items?$filter=AnniversaryDay gt `+ startDay + 
-      ` and AnniversaryMonth eq ` + startMonth + `'`, SPHttpClient.configurations.v1)
-      .then((response) => {
-        return response.json();
-      });  
-      var anniSecondMonth = this.context.spHttpClient.get(this.context.pageContext.web.absoluteUrl + 
-      `/_api/web/Lists/GetByTitle('Staff Events')/Items?$filter=AnniversaryDay lt `+ endDay + 
-      ` and AnniversaryMonth eq ` + endMonth + `'`, SPHttpClient.configurations.v1)
-      .then((response) => {
-        return response.json();
-      });
-      return bdayfirstMonth && bdaySecondMonth && annifirstMonth && anniSecondMonth;
-  }
-
-  private get1month(startDay, startMonth, endDay){
-    console.log(startDay, startMonth, endDay);
-    var bdayList = this.context.spHttpClient.get(this.context.pageContext.web.absoluteUrl + 
-      `/_api/web/Lists/GetByTitle('Staff Events')/Items?$filter=Birth_x0020_Day gt `+ startDay + ` and Birth_x0020_Day lt ` + endDay +
-      ` and Birth_x0020_Month eq ` + startMonth + `'`, SPHttpClient.configurations.v1)
-        .then((response) => {
-        return response.json();
-      });
-    var anniversaryList = this.context.spHttpClient.get(this.context.pageContext.web.absoluteUrl + 
-      `/_api/web/Lists/GetByTitle('Staff Events')/Items?$filter=AnniversaryDay gt `+ startDay + ` and AnniversaryDay lt ` + endDay +
-      ` and AnniversaryMonth eq ` + startMonth + `'`, SPHttpClient.configurations.v1)
-        .then((response) => {
-        return response.json();
-      });
-        
-      return bdayList && anniversaryList;
-  }
-
-  private _renderList(items: ISPList[]): void {  
+    }
+  
+  private _renderList(items: ISPList[]): void {
     let html: string = ``;
     items.forEach((item: ISPList) => {
+      let occassion = '';
+      let occassionInfo = '';
+      let occassion2 = '';
+      let occassionInfo2 = '';
+      item.Title = item.Title.toLowerCase();
+
+      var indexOfComma = item.Title.indexOf(',');
+      var firstName = item.Title.slice(indexOfComma + 2, item.Title.length);
+      firstName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+      var indexOfMiddleName = firstName.indexOf(' ');
+      if( indexOfMiddleName !== -1){
+        firstName = firstName.slice(0, indexOfMiddleName);
+      }
+
+      var lastName = item.Title.slice(0, indexOfComma);
+      lastName = lastName.charAt(0).toUpperCase() + lastName.slice(1);
+
+      var indexOf2ndLastName = lastName.indexOf(' ');
+      if(indexOf2ndLastName !== -1){
+        var firstLast = lastName.slice(0,indexOf2ndLastName);
+        var secondLast = lastName.slice(indexOf2ndLastName, lastName.length);
+        secondLast = secondLast.charAt(1).toUpperCase() + secondLast.slice(2);
+        lastName = firstLast + " " + secondLast
+      }
+      if(item.Birth_x0020_Month === currentMonth.toString() && item.AnniversaryMonth.toString() === currentMonth.toString()){
+        occassion = 'Birthday';
+        occassionInfo = item.Employee_x0020_Birthday;
+        occassion2 = "Anniversary";
+        occassionInfo2 = currentYear - item.AnniversaryYear + ' year(s)';
+      } else if(item.Birth_x0020_Month === currentMonth.toString()){
+        occassion = 'Birthday';
+        occassionInfo = item.Employee_x0020_Birthday;
+      } else if(item.AnniversaryMonth.toString() === currentMonth.toString()){
+        occassion = "Anniversary";
+        occassionInfo = pluralize('year', (currentYear - item.AnniversaryYear), true );
+      }
       html += `  
         <li>
-          <div class=${styles.image }> </div>
+          <div class=${styles.image }>
+            <img src="/_layouts/15/userphoto.aspx?size=L&username=${item.Email}"/>
+          </div>
           <div class=${styles.personWrapper}>
-            <span class=${styles.name}>${item.Title}</span>
-            <p class=${styles.position}>occasion</p>
-            <p class=${styles.reason}>bday date</p>
-            <p class=${styles.reason}>year(s)</p>
+            <span class=${styles.name}>${firstName} ${lastName}</span>
+            <p class=${styles.position}>${occassion}</p>
+            <p class=${styles.reason}>${occassionInfo}</p>
+            <p class=${styles.position}>${occassion2}</p>
+            <p class=${styles.reason}>${occassionInfo2}</p>
           </div>
         </li>
         `;  
