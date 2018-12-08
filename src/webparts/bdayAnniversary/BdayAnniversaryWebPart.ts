@@ -100,7 +100,7 @@ export default class BdayAnniversaryWebPart extends BaseClientSideWebPart<IBdayA
         occassion = 'Birthday';
         occassionInfo = item.Employee_x0020_Birthday;
         occassion2 = "Anniversary";
-        occassionInfo2 = currentYear - item.AnniversaryYear + ' year(s)';
+        occassionInfo2 = pluralize('year', (currentYear - item.AnniversaryYear), true );
       } else if(item.Birth_x0020_Month === currentMonth.toString()){
         occassion = 'Birthday';
         occassionInfo = item.Employee_x0020_Birthday;
