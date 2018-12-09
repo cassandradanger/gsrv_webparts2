@@ -1,15 +1,15 @@
 
-.main{
+.mainBA{
   width: 300px;
 }
-.title{
+.titleBA{
   color: green;
   font-size: 13pt;
   font-weight: 600;
   margin-bottom: -10px;
   text-align: center;
 }
-.content{
+.contentBA{
   padding: 10px 10px 10px 20px;
   border: 2px solid green;
   border-radius: 5px;
@@ -19,24 +19,22 @@
   overflow: auto;
   word-wrap: none;
 }
-svg{
+.svgBA{
   margin-bottom: -12px;
 }
-img{
+.imgBA{
   height: 60px;
   width: 60px;
   border-radius: 50px;
 }
-ul{
+.liBA{
+  margin-bottom: 15px;
   list-style: none;
 }
-li{
-  margin-bottom: 15px;
-}
-.personWrapper{
+.personWrapperBA{
   display: inline-block;
 }
-.image{
+.imageBA{
   border: 1px solid black;
   border-radius: 50px;
   height: 60px;
@@ -45,16 +43,16 @@ li{
   display: inline-block;
   vertical-align: top;
 }
-.name{
+.nameBA{
   font-weight: 600;
   font-size: 12pt;
 }
-.position{
+.positionBA{
   font-size: 9pt;
   margin-bottom: 17px;
   margin-top: 8px;
 }
-.reason{
+.reasonBA{
   font-size: 9pt;
   font-style: italic;
 }

@@ -41,12 +41,12 @@ export default class BdayAnniversaryWebPart extends BaseClientSideWebPart<IBdayA
 
   public render(): void {
     this.domElement.innerHTML = `
-    <div class=${styles.main}>
-        <p class=${styles.title}> 
-          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 18 18"><path fill="green" d="M9 11.3l3.71 2.7-1.42-4.36L15 7h-4.55L9 2.5 7.55 7H3l3.71 2.64L5.29 14z"/><path fill="none" d="M0 0h18v18H0z"/></svg>
+    <div class=${styles.mainBA}>
+        <p class=${styles.titleBA}>
+          <svg class=${styles.svgBA} xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 18 18"><path fill="green" d="M9 11.3l3.71 2.7-1.42-4.36L15 7h-4.55L9 2.5 7.55 7H3l3.71 2.64L5.29 14z"/><path fill="none" d="M0 0h18v18H0z"/></svg>
           Birthdays & Anniversaries
         </p>
-        <ul class=${styles.content}>
+        <ul class=${styles.contentBA}>
           <div id="spListContainer" /></div>
         </ul>
       </div>
@@ -60,7 +60,7 @@ export default class BdayAnniversaryWebPart extends BaseClientSideWebPart<IBdayA
 
 
   private _firstGetList() {
-    this.context.spHttpClient.get(this.context.pageContext.web.absoluteUrl + 
+    this.context.spHttpClient.get('https://girlscoutsrv.sharepoint.com' + 
       `/_api/web/Lists/GetByTitle('Staff Events')/Items?$filter=((Birth_x0020_Month eq ` + currentMonth + `) or (AnniversaryMonth eq ` + currentMonth + '))', SPHttpClient.configurations.v1)
       .then((response)=>{
         response.json().then((data)=>{
@@ -109,16 +109,16 @@ export default class BdayAnniversaryWebPart extends BaseClientSideWebPart<IBdayA
         occassionInfo = pluralize('year', (currentYear - item.AnniversaryYear), true );
       }
       html += `  
-        <li>
-          <div class=${styles.image }>
-            <img src="/_layouts/15/userphoto.aspx?size=L&username=${item.Email}"/>
+        <li class=${styles.liBA}>
+          <div class=${styles.imageBA}>
+            <img class=${styles.imgBA} src="/_layouts/15/userphoto.aspx?size=L&username=${item.Email}"/>
           </div>
-          <div class=${styles.personWrapper}>
-            <span class=${styles.name}>${firstName} ${lastName}</span>
-            <p class=${styles.position}>${occassion}</p>
-            <p class=${styles.reason}>${occassionInfo}</p>
-            <p class=${styles.position}>${occassion2}</p>
-            <p class=${styles.reason}>${occassionInfo2}</p>
+          <div class=${styles.personWrapperBA}>
+            <span class=${styles.nameBA}>${firstName} ${lastName}</span>
+            <p class=${styles.positionBA}>${occassion}</p>
+            <p class=${styles.reasonBA}>${occassionInfo}</p>
+            <p class=${styles.positionBA}>${occassion2}</p>
+            <p class=${styles.reasonBA}>${occassionInfo2}</p>
           </div>
         </li>
         `;  
