@@ -1,17 +1,21 @@
+body{
+  font-family: 'Trefoil sans'
+}
 
 .mainBA{
   width: 300px;
 }
 .titleBA{
-  color: green;
+  color: #57b372;
   font-size: 13pt;
   font-weight: 600;
-  margin-bottom: -10px;
+  margin-bottom: -15px;
   text-align: center;
+  display: inline-block;
 }
 .contentBA{
   padding: 10px 10px 10px 20px;
-  border: 2px solid green;
+  border: 2px solid #57b372;
   border-radius: 5px;
   width: 300px;
   height: 65px;
@@ -19,8 +23,15 @@
   overflow: auto;
   word-wrap: none;
 }
-.svgBA{
-  margin-bottom: -12px;
+.starBA{
+  margin-bottom: -15px;
+  margin-left: 40px;
+  height: 40px;
+  width: 40px;
+  background-image: url('./Birthdays-Anniversaries.png');
+  background-repeat: no-repeat;
+  background-size: 40px 40px;
+  display: inline-block;
 }
 .imgBA{
   height: 60px;

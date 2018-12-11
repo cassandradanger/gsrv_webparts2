@@ -42,14 +42,13 @@ export default class BdayAnniversaryWebPart extends BaseClientSideWebPart<IBdayA
   public render(): void {
     this.domElement.innerHTML = `
     <div class=${styles.mainBA}>
-        <p class=${styles.titleBA}>
-          <svg class=${styles.svgBA} xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 18 18"><path fill="green" d="M9 11.3l3.71 2.7-1.42-4.36L15 7h-4.55L9 2.5 7.55 7H3l3.71 2.64L5.29 14z"/><path fill="none" d="M0 0h18v18H0z"/></svg>
-          Birthdays & Anniversaries
-        </p>
-        <ul class=${styles.contentBA}>
-          <div id="spListContainer" /></div>
-        </ul>
-      </div>
+      <p class=${styles.starBA}></p>
+      <p class=${styles.titleBA}>
+        Birthdays & Anniversaries
+      </p>
+      <ul class=${styles.contentBA}>
+        <div id="spListContainer" /></div>
+      </ul>
     </div>`;
       this._firstGetList();
   }
