@@ -114,10 +114,9 @@ export default class BdayAnniversaryWebPart extends BaseClientSideWebPart<IBdayA
           </div>
           <div class=${styles.personWrapperBA}>
             <span class=${styles.nameBA}>${firstName} ${lastName}</span>
-            <p class=${styles.positionBA}>${occassion}</p>
-            <p class=${styles.reasonBA}>${occassionInfo}</p>
-            <p class=${styles.positionBA}>${occassion2}</p>
-            <p class=${styles.reasonBA}>${occassionInfo2}</p>
+            <p class=${styles.positionBA}>POSITION GOES HERE</p>
+            <p class=${styles.reasonBA}>${occassion}: ${occassionInfo}</p>
+            <p class=${styles.reasonBA}>${occassion2} ${occassionInfo2}</p>
           </div>
         </li>
         `;  
