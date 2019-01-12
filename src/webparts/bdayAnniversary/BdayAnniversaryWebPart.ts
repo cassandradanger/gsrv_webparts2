@@ -22,6 +22,7 @@ export interface ISPLists {
 
 export interface ISPList{
   Title: string;
+  Anniversary_x0020_Date: string;
   Employee_x0020_Birthday: string;
   Employee_x0020_Anniversary: string;
   Birth_x0020_Day: string;
@@ -32,10 +33,19 @@ export interface ISPList{
 }
 
 var today = new Date();
-var currentMonth = today.getMonth() +1;
+var currentMonth =  today.getMonth() +1;
 var currentYear = today.getFullYear();
+var day = today.getDate();
 
-var date = new Date(); date.setDate(date.getDate() + 7); 
+var strToday = currentMonth + "/" + day + "/" + currentYear;
+
+ 
+var datePlusSeven = new Date(); datePlusSeven.setDate(datePlusSeven.getDate() + 7); 
+var monthPlus7 = datePlusSeven.getMonth() +1;
+var dayPlus7 = datePlusSeven.getDate();
+var yearPlus7 = datePlusSeven.getFullYear();
+
+var strPlus7 = monthPlus7 + "/" + dayPlus7 + "/" + yearPlus7;
 
 export default class BdayAnniversaryWebPart extends BaseClientSideWebPart<IBdayAnniversaryWebPartProps> {
 
@@ -59,8 +69,8 @@ export default class BdayAnniversaryWebPart extends BaseClientSideWebPart<IBdayA
 
 
   private _firstGetList() {
-    this.context.spHttpClient.get('https://girlscoutsrv.sharepoint.com' + 
-      `/_api/web/Lists/GetByTitle('Staff Events')/Items?$filter=((Birth_x0020_Month eq ` + currentMonth + `) or (AnniversaryMonth eq ` + currentMonth + '))', SPHttpClient.configurations.v1)
+    this.context.spHttpClient.get('https://girlscoutsrv.sharepoint.com' +
+      `/_api/web/Lists/GetByTitle('Staff Events')/Items?$filter=((CurrentBirthDay ge '${strToday}') and (CurrentBirthDay le '${strPlus7}')) or ((CurrentAnniversary ge '${strToday}') and (CurrentAnniversary le '${strPlus7}'))`, SPHttpClient.configurations.v1)
       .then((response)=>{
         response.json().then((data)=>{
           this._renderList(data.value)
@@ -69,6 +79,7 @@ export default class BdayAnniversaryWebPart extends BaseClientSideWebPart<IBdayA
     }
   
   private _renderList(items: ISPList[]): void {
+    console.log(items);
     let html: string = ``;
     items.forEach((item: ISPList) => {
       let occassion = '';
@@ -76,6 +87,11 @@ export default class BdayAnniversaryWebPart extends BaseClientSideWebPart<IBdayA
       let occassion2 = '';
       let occassionInfo2 = '';
       item.Title = item.Title.toLowerCase();
+      let anniversaryYear = item.Anniversary_x0020_Date.slice(0, 4);
+      let anniversaryMonth = item.Anniversary_x0020_Date.slice(5, 7);
+      if(anniversaryMonth.charAt(0) === '0'){
+        anniversaryMonth = item.Anniversary_x0020_Date.slice(6, 7);
+      }
 
       var indexOfComma = item.Title.indexOf(',');
       var firstName = item.Title.slice(indexOfComma + 2, item.Title.length);
@@ -95,17 +111,17 @@ export default class BdayAnniversaryWebPart extends BaseClientSideWebPart<IBdayA
         secondLast = secondLast.charAt(1).toUpperCase() + secondLast.slice(2);
         lastName = firstLast + " " + secondLast
       }
-      if(item.Birth_x0020_Month === currentMonth.toString() && item.AnniversaryMonth.toString() === currentMonth.toString()){
+      if(item.Birth_x0020_Month === currentMonth.toString() && anniversaryMonth.toString() === currentMonth.toString()){
         occassion = 'Birthday';
         occassionInfo = item.Employee_x0020_Birthday;
         occassion2 = "Anniversary";
-        occassionInfo2 = pluralize('year', (currentYear - item.AnniversaryYear), true );
+        occassionInfo2 = pluralize('year', (currentYear - parseInt(anniversaryYear)), true );
       } else if(item.Birth_x0020_Month === currentMonth.toString()){
         occassion = 'Birthday';
         occassionInfo = item.Employee_x0020_Birthday;
-      } else if(item.AnniversaryMonth.toString() === currentMonth.toString()){
+      } else if(anniversaryMonth.toString() === currentMonth.toString()){
         occassion = "Anniversary";
-        occassionInfo = pluralize('year', (currentYear - item.AnniversaryYear), true );
+        occassionInfo = pluralize('year', (currentYear - parseInt(anniversaryYear)), true );
       }
       html += `  
         <li class=${styles.liBA}>
