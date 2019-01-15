@@ -22,14 +22,15 @@ export interface ISPLists {
 
 export interface ISPList{
   Title: string;
-  Anniversary_x0020_Date: string;
-  Employee_x0020_Birthday: string;
+  CurrentAnniversary: string;
+  CurrentBirthDay: string;
   Employee_x0020_Anniversary: string;
   Birth_x0020_Day: string;
   Birth_x0020_Month: string;
   AnniversaryYear: number;
   AnniversaryMonth: number;
   Email: string;
+  Employee: any;
 }
 
 var today = new Date();
@@ -69,8 +70,9 @@ export default class BdayAnniversaryWebPart extends BaseClientSideWebPart<IBdayA
 
 
   private _firstGetList() {
+    
     this.context.spHttpClient.get('https://girlscoutsrv.sharepoint.com' +
-      `/_api/web/Lists/GetByTitle('Staff Events')/Items?$filter=((CurrentBirthDay ge '${strToday}') and (CurrentBirthDay le '${strPlus7}')) or ((CurrentAnniversary ge '${strToday}') and (CurrentAnniversary le '${strPlus7}'))`, SPHttpClient.configurations.v1)
+    `/_api/web/Lists/GetByTitle('Staff Events')/Items?$select=Title,CurrentBirthDay,CurrentAnniversary,Employee/JobTitle,Employee/SipAddress&$filter=((CurrentBirthDay ge '${strToday}') and (CurrentBirthDay le '${strPlus7}')) or ((CurrentAnniversary ge '${strToday}') and (CurrentAnniversary le '${strPlus7}'))&$expand=Employee/JobTitle,Employee/SipAddress`, SPHttpClient.configurations.v1)
       .then((response)=>{
         response.json().then((data)=>{
           this._renderList(data.value)
@@ -79,7 +81,6 @@ export default class BdayAnniversaryWebPart extends BaseClientSideWebPart<IBdayA
     }
   
   private _renderList(items: ISPList[]): void {
-    console.log(items);
     let html: string = ``;
     items.forEach((item: ISPList) => {
       let occassion = '';
@@ -87,12 +88,20 @@ export default class BdayAnniversaryWebPart extends BaseClientSideWebPart<IBdayA
       let occassion2 = '';
       let occassionInfo2 = '';
       item.Title = item.Title.toLowerCase();
-      let anniversaryYear = item.Anniversary_x0020_Date.slice(0, 4);
-      let anniversaryMonth = item.Anniversary_x0020_Date.slice(5, 7);
+      let anniversaryYear = item.CurrentAnniversary.slice(0, 4);
+      let anniversaryMonth = item.CurrentAnniversary.slice(5, 7);
+      let birthMonth = item.CurrentBirthDay.slice(5, 7);
+      let birthDate = item.CurrentBirthDay.slice(8,10);
+      
       if(anniversaryMonth.charAt(0) === '0'){
-        anniversaryMonth = item.Anniversary_x0020_Date.slice(6, 7);
+        anniversaryMonth = item.CurrentAnniversary.slice(6, 7);
       }
-
+      if(birthMonth.charAt(0) === '0'){
+        birthMonth = item.CurrentBirthDay.slice(6, 7);
+      }
+      if(birthDate.charAt(0) === '0'){
+        birthDate = item.CurrentBirthDay.slice(9, 10);
+      }
       var indexOfComma = item.Title.indexOf(',');
       var firstName = item.Title.slice(indexOfComma + 2, item.Title.length);
       firstName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
@@ -111,14 +120,14 @@ export default class BdayAnniversaryWebPart extends BaseClientSideWebPart<IBdayA
         secondLast = secondLast.charAt(1).toUpperCase() + secondLast.slice(2);
         lastName = firstLast + " " + secondLast
       }
-      if(item.Birth_x0020_Month === currentMonth.toString() && anniversaryMonth.toString() === currentMonth.toString()){
+      if(birthMonth === currentMonth.toString() && anniversaryMonth.toString() === currentMonth.toString()){
         occassion = 'Birthday';
-        occassionInfo = item.Employee_x0020_Birthday;
+        occassionInfo =  `${birthMonth}/${birthDate}`
         occassion2 = "Anniversary";
         occassionInfo2 = pluralize('year', (currentYear - parseInt(anniversaryYear)), true );
-      } else if(item.Birth_x0020_Month === currentMonth.toString()){
+      } else if(birthMonth === currentMonth.toString()){
         occassion = 'Birthday';
-        occassionInfo = item.Employee_x0020_Birthday;
+        occassionInfo = `${birthMonth}/${birthDate}`
       } else if(anniversaryMonth.toString() === currentMonth.toString()){
         occassion = "Anniversary";
         occassionInfo = pluralize('year', (currentYear - parseInt(anniversaryYear)), true );
@@ -126,11 +135,11 @@ export default class BdayAnniversaryWebPart extends BaseClientSideWebPart<IBdayA
       html += `  
         <li class=${styles.liBA}>
           <div class=${styles.imageBA}>
-            <img class=${styles.imgBA} src="/_layouts/15/userphoto.aspx?size=L&username=${item.Email}"/>
+            <img class=${styles.imgBA} src="/_layouts/15/userphoto.aspx?size=L&username=${item.Employee.SipAddress}"/>
           </div>
           <div class=${styles.personWrapperBA}>
             <span class=${styles.nameBA}>${firstName} ${lastName}</span>
-            <p class=${styles.positionBA}>POSITION GOES HERE</p>
+            <p class=${styles.positionBA}>${item.Employee.JobTitle}</p>
             <p class=${styles.reasonBA}>${occassion}: ${occassionInfo}</p>
             <p class=${styles.reasonBA}>${occassion2} ${occassionInfo2}</p>
           </div>
